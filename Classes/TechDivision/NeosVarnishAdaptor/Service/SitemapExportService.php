@@ -75,9 +75,10 @@ class SitemapExportService {
 	 * @param Site $site
 	 * @param ContentContext $contentContext
 	 * @param string $baseUri
+	 * @param array $excludePathsRecursively
 	 * @return string
 	 */
-	public function exportSitemap(Site $site, ContentContext $contentContext, $baseUri) {
+	public function exportSitemap(Site $site, ContentContext $contentContext, $baseUri, array $excludePathsRecursively = array()) {
 		$this->initializeRouter();
 		$this->baseUri = new Uri($baseUri);
 		putenv('REDIRECT_FLOW_REWRITEURLS=1');
@@ -88,7 +89,7 @@ class SitemapExportService {
 		$this->xmlWriter->startDocument('1.0', 'UTF-8');
 		$this->xmlWriter->startElementNs(NULL, 'urlset', 'http://www.sitemaps.org/schemas/sitemap/0.9');
 
-		$this->exportSite($site, $contentContext);
+		$this->exportSite($site, $contentContext, $excludePathsRecursively);
 
 		$this->xmlWriter->endElement();
 		$this->xmlWriter->endDocument();
@@ -100,30 +101,39 @@ class SitemapExportService {
 	 *
 	 * @param Site $site
 	 * @param ContentContext $contentContext
+	 * @param array $excludePathsRecursively
 	 * @return void
 	 */
-	protected function exportSite(Site $site, ContentContext $contentContext) {
+	protected function exportSite(Site $site, ContentContext $contentContext, array $excludePathsRecursively = array()) {
 		$contextProperties = $contentContext->getProperties();
 		$contextProperties['currentSite'] = $site;
 		$contentContext = $this->contextFactory->create($contextProperties);
 
 		/** @var NodeInterface $siteNode */
 		$siteNode = $contentContext->getCurrentSiteNode();
-		$this->exportChildNodes($siteNode);
+
+		foreach ($excludePathsRecursively as $i => $path) {
+			$excludePathsRecursively[$i] = $siteNode->getPath() . '/' . $path;
+		}
+
+		$this->exportChildNodes($siteNode, $excludePathsRecursively);
 	}
 
 	/**
 	 * Export a single node to the XMLWriter
 	 *
 	 * @param NodeInterface $parentNode
+	 * @param array $excludePathsRecursively
 	 * @return void
 	 */
-	protected function exportChildNodes(NodeInterface $parentNode) {
-		foreach ($parentNode->getChildNodes('TYPO3.Neos:Page') as $childNode) {
-			/** @var NodeInterface $childNode */
-			$this->exportNode($childNode);
-			if ($childNode->hasChildNodes()) {
-				$this->exportChildNodes($childNode);
+	protected function exportChildNodes(NodeInterface $parentNode, array $excludePathsRecursively = array()) {
+		foreach ($parentNode->getChildNodes('TYPO3.Neos:Document') as $childNode) {
+			if (!in_array($childNode->getPath(), $excludePathsRecursively)) {
+				/** @var NodeInterface $childNode */
+				$this->exportNode($childNode);
+				if ($childNode->hasChildNodes()) {
+					$this->exportChildNodes($childNode);
+				}
 			}
 		}
 	}
