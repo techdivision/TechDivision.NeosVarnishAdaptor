@@ -85,7 +85,6 @@ class SitemapExportService {
 
 		$this->xmlWriter = new \XMLWriter();
 		$this->xmlWriter->openMemory();
-		$this->xmlWriter->setIndent(TRUE);
 		$this->xmlWriter->startDocument('1.0', 'UTF-8');
 		$this->xmlWriter->startElementNs(NULL, 'urlset', 'http://www.sitemaps.org/schemas/sitemap/0.9');
 
