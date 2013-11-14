@@ -1,0 +1,14 @@
+{
+    "name": "techdivision/neosvarnishadaptor",
+    "type": "typo3-flow-package",
+    "description": "This package provides functionality for the interaction of Neos and Varnish.",
+    "license": ["MIT"],
+    "require": {
+        "typo3/neos": "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "TechDivision\\NeosVarnishAdaptor": "Classes"
+        }
+    }
+}
