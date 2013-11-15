@@ -1,0 +1,7 @@
+TechDivision:
+  NeosVarnishAdaptor:
+    cacheHeaders:
+      defaultMaximumAge: 60
+      defaultSharedMaximumAge: 31536000
+
+    spiderIndexingPathAndFilename: %FLOW_PATH_DATA%Temporary/VarnishSpider.txt

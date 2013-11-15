@@ -50,16 +50,17 @@ class SitemapCommandController extends CommandController {
 	 * @param string $site Node name of the site (e.g. "neostypo3org")
 	 * @param string $baseUri The base URI which is prepended to all generated URIs (e.g. "http://example.com/")
 	 * @param string $excludePathsRecursively A comma separated list of node paths to exclude from the sitemap, also excluding any children
+	 * @param string $format The output format. Can be either "xml" or "list" for a plain list of URLs
 	 * @return void
 	 */
-	public function exportCommand($site, $baseUri = 'http://localhost/', $excludePathsRecursively = '') {
+	public function exportCommand($site, $baseUri = 'http://localhost/', $excludePathsRecursively = '', $format = 'xml') {
 		$contentContext = $this->contextFactory->create(array('workspaceName' => 'live', 'invisibleContentShown' => FALSE, 'inaccessibleContentShown' => FALSE));
 		$siteObject = $this->siteRepository->findOneByNodeName($site);
 		if ($siteObject === NULL) {
 			$this->outputLine('Site %s does not exist.', array($site));
 			$this->quit(1);
 		}
-		$this->output($this->sitemapExportService->exportSitemap($siteObject, $contentContext, $baseUri, Arrays::trimExplode(',', $excludePathsRecursively)));
+		$this->output($this->sitemapExportService->exportSitemap($siteObject, $contentContext, $baseUri, Arrays::trimExplode(',', $excludePathsRecursively), $format));
 	}
 
 }
