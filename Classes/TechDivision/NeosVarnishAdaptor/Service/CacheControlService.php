@@ -60,10 +60,13 @@ class CacheControlService {
 	 */
 	public function addHeaders(RequestInterface $request, ResponseInterface $response, ControllerInterface $controller) {
 		if ($response instanceof Response && $controller instanceof NodeController) {
-			$node = $controller->getControllerContext()->getArguments()->getArgument('node')->getValue();
-			if ($node instanceof NodeInterface) {
-				$response->setHeader('X-Neos-Powered', 'Neos/dev-way-beyond-master');
-				$response->setHeader('X-Neos-SecretSpeedMode', 'lightspeed');
+			$arguments = $controller->getControllerContext()->getArguments();
+			if ($arguments->hasArgument('node')) {
+				$node = $arguments->getArgument('node')->getValue();
+				if ($node instanceof NodeInterface) {
+					$response->setHeader('X-Neos-Powered', 'Neos/dev-way-beyond-master');
+					$response->setHeader('X-Neos-SecretSpeedMode', 'lightspeed');
+				}
 			}
 		}
 	}
